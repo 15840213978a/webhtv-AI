@@ -1,16 +1,15 @@
 package com.fongmi.android.tv.ui.dialog;
 
-import androidx.fragment.app.FragmentActivity;
 import android.app.Dialog;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.DialogFragment;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.setting.Setting;
 
 public class ThemeDialog extends DialogFragment {
 
@@ -19,6 +18,11 @@ public class ThemeDialog extends DialogFragment {
     }
 
     private Listener listener;
+
+    public static void show(FragmentActivity activity) {
+        ThemeDialog dialog = new ThemeDialog();
+        dialog.show(activity.getSupportFragmentManager(), "theme");
+    }
 
     public static void show(FragmentActivity activity, Listener listener) {
         ThemeDialog dialog = new ThemeDialog();
@@ -29,43 +33,14 @@ public class ThemeDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        String[] themes = {
-                "系统默认",
-                "自定义颜色",
-                "关闭"
-        };
-
-        int checked = Setting.getThemeColor() == -1
-                ? 0
-                : Setting.getThemeColor() == 0
-                ? 1
-                : 2;
-
+        String[] themes = {"系统默认", "自定义颜色", "关闭"};
         return new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.setting_theme_color)
-                .setSingleChoiceItems(
-                        themes,
-                        Math.min(checked, 2),
-                        (dialog, which) -> {
-
-                            int color = which == 0
-                                    ? -1
-                                    : which == 1
-                                    ? 0
-                                    : Setting.getThemeColor();
-
-                            Setting.putThemeColor(color);
-
-                            if (listener != null) {
-                                listener.setTheme(color);
-                            }
-
-                            RefreshEvent.theme();
-
-                            dialog.dismiss();
-                        }
-                )
-                .create();
+                .setSingleChoiceItems(themes, 0, (dialog, which) -> {
+                    Setting.putThemeColor(which == 0 ? -1 : 0);
+                    if (listener != null) listener.setTheme(Setting.getThemeColor());
+                    RefreshEvent.theme();
+                    dialog.dismiss();
+                }).create();
     }
 }
