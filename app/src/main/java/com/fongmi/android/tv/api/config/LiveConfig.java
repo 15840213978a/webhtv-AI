@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 public class LiveConfig extends BaseConfig {
 
     private static final String TAG = LiveConfig.class.getSimpleName();
+    private static final String DEFAULT_CLYS = "assets://clys/chenlong.jpg";
 
     private Live home;
     private List<Live> lives;
@@ -124,7 +125,12 @@ public class LiveConfig extends BaseConfig {
             initLive(config, new JsonObject());
             return;
         }
-        String json = Decoder.getJson(UrlUtil.convert(config.getUrl()), TAG);
+        String url = config.getUrl();
+        if (TextUtils.isEmpty(url)) {
+            url = DEFAULT_CLYS;
+        }
+
+        String json = Decoder.getJson(UrlUtil.convert(url), TAG);
         if (Json.isObj(json)) checkJson(config, Json.parse(json).getAsJsonObject());
         else parseText(config, json);
     }
