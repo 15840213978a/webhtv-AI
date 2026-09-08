@@ -575,8 +575,8 @@ public class SettingActivity extends BaseActivity implements ConfigListener, Sit
                     if (latest == null) { tvStatus.setText("未找到备份文件"); return; }
                     File tempFile = new File(getExternalCacheDir(), "restore_temp." + (latest.path.endsWith(".zip") ? "zip" : "gz"));
                     tvStatus.setText("正在下载...");
+                    final WebdavUtil.RemoteFile finalLatest = latest;
                     new Thread(() -> {
-                        final WebdavUtil.RemoteFile finalLatest = latest;
                         boolean downloaded = WebdavUtil.downloadFile(url, user, pass, finalLatest.path, tempFile);
                         runOnUiThread(() -> {
                             if (!downloaded) { tvStatus.setText("下载失败"); return; }
