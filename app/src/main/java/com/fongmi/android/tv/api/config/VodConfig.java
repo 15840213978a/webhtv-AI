@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 public class VodConfig extends BaseConfig {
 
     private static final String TAG = VodConfig.class.getSimpleName();
+    private static final String DEFAULT_CLYS = "assets://clys/chenlong.jpg";
 
     private Site home;
     private String wall;
@@ -117,7 +118,11 @@ public class VodConfig extends BaseConfig {
 
     @Override
     protected void load(Config config) throws Throwable {
-        String json = Decoder.getJson(UrlUtil.convert(config.getUrl()), TAG);
+        String url = config.getUrl();
+        if (TextUtils.isEmpty(url)) {
+            url = DEFAULT_CLYS;
+        }
+        String json = Decoder.getJson(UrlUtil.convert(url), TAG);
         checkJson(config, Json.parse(json).getAsJsonObject());
     }
 
