@@ -1,9 +1,13 @@
 package com.fongmi.android.tv.utils;
 
 import com.github.catvod.net.OkHttp;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class WebdavUtil {
 
@@ -14,7 +18,10 @@ public class WebdavUtil {
 
     private static boolean request(String url) {
         try {
-            return OkHttp.get().get(url).isSuccessful();
+            Call call = OkHttp.get().newCall(url);
+            try (Response response = call.execute()) {
+                return response.isSuccessful();
+            }
         } catch (Exception e) {
             return false;
         }
