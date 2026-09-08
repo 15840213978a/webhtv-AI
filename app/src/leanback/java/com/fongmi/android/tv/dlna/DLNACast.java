@@ -36,6 +36,7 @@ public class DLNACast {
         DLNACastManager mgr = DLNACastManager.get();
         ControlPoint control = mgr.getControlPoint();
         RemoteService service = mgr.findAVTransport(item);
+
         if (service != null && control != null) {
             control.execute(uriAction(control, service));
         } else {
@@ -46,12 +47,22 @@ public class DLNACast {
     private String buildMetaData() {
         try {
             DIDLContent content = new DIDLContent();
+
             VideoItem item = new VideoItem(
-                    "0", "-1", video.name, "",
-                    new Res(new ProtocolInfo("http-get:*:video/*:*"),
-                            0L, video.url));
+                    "0",
+                    "-1",
+                    video.name,
+                    "",
+                    new Res(
+                            new ProtocolInfo("http-get:*:video/*:*"),
+                            0L,
+                            video.url
+                    )
+            );
+
             content.addItem(item);
             return new DIDLParser().generate(content);
+
         } catch (Exception e) {
             return "";
         }
@@ -59,6 +70,7 @@ public class DLNACast {
 
     private SetAVTransportURI uriAction(ControlPoint control, RemoteService service) {
         return new SetAVTransportURI(service, video.url, buildMetaData()) {
+
             @Override
             public void success(ActionInvocation i) {
                 control.execute(playAction(control, service));
@@ -73,6 +85,7 @@ public class DLNACast {
 
     private Play playAction(ControlPoint control, RemoteService service) {
         return new Play(service) {
+
             @Override
             public void success(ActionInvocation i) {
                 App.post(runnable);
@@ -87,15 +100,27 @@ public class DLNACast {
 
     private Seek seekAction(RemoteService service) {
         return new Seek(service, SeekMode.REL_TIME, formatMs(0)) {
-            @Override public void success(ActionInvocation i) {}
-            @Override public void failure(ActionInvocation i, UpnpResponse r, String m) {}
+
+            @Override
+            public void success(ActionInvocation i) {
+            }
+
+            @Override
+            public void failure(ActionInvocation i, UpnpResponse r, String msg) {
+            }
         };
     }
 
     private String formatMs(long ms) {
         if (ms <= 0) return "00:00:00";
+
         long s = ms / 1000;
-        return String.format(Locale.US, "%02d:%02d:%02d",
-                s / 3600, (s % 3600) / 60, s % 60);
+        return String.format(
+                Locale.US,
+                "%02d:%02d:%02d",
+                s / 3600,
+                (s % 3600) / 60,
+                s % 60
+        );
     }
 }
